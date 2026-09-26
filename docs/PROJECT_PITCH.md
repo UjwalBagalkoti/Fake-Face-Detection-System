@@ -1,0 +1,3 @@
+# 60-second project pitch
+
+ForensicFusion is a deepfake detection system designed to avoid relying on a single visual signal. For images, it combines EfficientNet spatial features with a frequency-domain branch built from FFT representations. For video, frame embeddings are passed through a Transformer to capture temporal inconsistencies. The inference layer performs face detection and preprocessing, calibrates the operating threshold using validation data, and returns a real/fake probability with frame-level evidence. The evaluation pipeline reports standard classification metrics and supports cross-dataset testing to measure generalization.
