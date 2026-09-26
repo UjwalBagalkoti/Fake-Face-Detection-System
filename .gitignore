@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.DS_Store
+models/*.pth
+models/*.pt
+models/*.onnx
+runs/
+outputs/
+uploads/
+logs/
+wandb/
+mlruns/
