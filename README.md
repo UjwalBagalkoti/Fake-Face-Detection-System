@@ -35,7 +35,11 @@ Face detection + preprocessing
 - Gradient-based visual explanation
 - FastAPI inference service
 - Browser dashboard for image and video uploads
+- Test-time augmentation for image inference
+- Calibrated uncertain-decision band
 - Cross-dataset evaluation utilities
+- Compression and blur robustness evaluation
+- GitHub Actions CI
 
 ## Dataset layout
 
@@ -125,12 +129,14 @@ Set the model checkpoint path:
 ```bash
 # Windows PowerShell
 $env:FORENSIC_MODEL="models/best_image_model.pth"
+$env:FORENSIC_VIDEO_MODEL="models/best_video_model.pth"
 python run.py
 ```
 
 ```bash
 # Linux/macOS
 export FORENSIC_MODEL=models/best_image_model.pth
+export FORENSIC_VIDEO_MODEL=models/best_video_model.pth
 python run.py
 ```
 
@@ -153,6 +159,16 @@ Open `http://127.0.0.1:8000`.
 ## Explainability
 
 `detection/explain.py` provides a gradient-based heatmap over the CNN feature map. This is intended to show which facial regions contributed to a prediction; it is not independent proof of manipulation.
+
+## Robustness evaluation
+
+Run the stress suite against the untouched test split:
+
+```bash
+python -m scripts.robustness_eval --data data/images --model models/best_image_model.pth
+```
+
+This evaluates native images plus JPEG compression and blur variants without changing the trained threshold.
 
 ## Evaluation protocol
 
