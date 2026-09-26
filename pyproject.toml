@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forensic-fusion"
+version = "1.0.0"
+description = "Multimodal deepfake detection system"
+requires-python = ">=3.10"
+dependencies = [
+  "torch>=2.3",
+  "torchvision>=0.18",
+  "opencv-python>=4.8",
+  "numpy>=1.26",
+  "Pillow>=10",
+  "scikit-learn>=1.4",
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.29",
+  "python-multipart>=0.0.9",
+  "pydantic>=2.6",
+]
+
+[project.scripts]
+forensic-fusion = "run:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
