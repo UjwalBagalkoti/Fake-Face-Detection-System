@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "forensic-fusion"
+name = "fake-face-detection-system"
 version = "1.0.0"
 description = "Multimodal deepfake detection system"
 requires-python = ">=3.10"
@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.scripts]
-forensic-fusion = "run:main"
+fake-face-detection-system = "run:main"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
