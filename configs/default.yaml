@@ -1,5 +1,5 @@
 project:
-  name: ForensicFusion
+  name: Fake Face Detection System
   version: 1.0
 model:
   backbone: efficientnet_b4
