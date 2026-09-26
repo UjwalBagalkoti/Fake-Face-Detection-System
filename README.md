@@ -71,8 +71,6 @@ data/video_frames/
 
 Keep all frames from the same source video in the same split. Do not randomly distribute frames from one video across train and test.
 
-Recommended benchmark sources include FaceForensics++, Celeb-DF/Celeb-DF++, and DF40. Follow their access, citation and licensing requirements.
-
 ## Installation
 
 Python 3.10+ is recommended.
@@ -195,10 +193,3 @@ ForensicFusion/
 ## Limitations
 
 Detector performance can change under unseen generators, strong compression, resizing, adversarial edits, poor face crops, unusual lighting, and distribution shift. Predictions should be treated as model evidence rather than definitive proof of authenticity.
-
-## References
-
-- DeepfakeBench — https://github.com/SCLBD/DeepfakeBench
-- DF40 — https://github.com/YZY-stack/DF40
-- FaceForensics++ — https://github.com/ondyari/FaceForensics
-- Celeb-DF++ — https://arxiv.org/abs/2507.18015
