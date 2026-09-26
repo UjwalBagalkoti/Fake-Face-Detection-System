@@ -1,0 +1,27 @@
+project:
+  name: ForensicFusion
+  version: 1.0
+model:
+  backbone: efficientnet_b4
+  pretrained: true
+  image_size: 224
+  freq_size: 224
+  embedding_dim: 256
+  dropout: 0.30
+  temporal_layers: 2
+  temporal_heads: 8
+  temporal_frames: 24
+training:
+  epochs: 15
+  batch_size: 24
+  learning_rate: 0.0002
+  weight_decay: 0.00001
+  seed: 42
+  num_workers: 4
+evaluation:
+  threshold_metric: youden_j
+  report_cross_dataset: true
+inference:
+  max_video_frames: 24
+  face_margin: 0.20
+  min_face_size: 80
