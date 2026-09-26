@@ -1,4 +1,4 @@
-# Model Card — ForensicFusion
+# Model Card — Fake Face Detection System
 
 ## Intended use
 Research, development, evaluation and forensic-method experimentation for manipulated-face detection.
