@@ -1,6 +1,6 @@
-# ForensicFusion — Deepfake Detection System
+# Fake Face Detection System
 
-ForensicFusion is an end-to-end deepfake detection system for manipulated faces in images and videos. It combines spatial visual evidence, frequency-domain artifacts, and temporal consistency to produce a calibrated real/fake prediction.
+Fake Face Detection System is an end-to-end deepfake detection system for manipulated faces in images and videos. It combines spatial visual evidence, frequency-domain artifacts, and temporal consistency to produce a calibrated real/fake prediction.
 
 ## Architecture
 
@@ -190,7 +190,7 @@ Avoid using the same source identities or source videos in both training and tes
 ## Project structure
 
 ```text
-ForensicFusion/
+Fake Face Detection System/
 ├── app/                    FastAPI service
 ├── configs/                configuration files
 ├── detection/              models, preprocessing and inference
