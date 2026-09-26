@@ -41,10 +41,31 @@ class Predictor:
     def _tensor(self,bgr):
         return self.tf(Image.fromarray(cv2.cvtColor(bgr,cv2.COLOR_BGR2RGB))).unsqueeze(0).to(self.device)
 
+    def _label(self,p,threshold):
+        margin=0.05
+        if abs(float(p)-threshold)<margin:
+            return "UNCERTAIN"
+        return "FAKE" if p>=threshold else "REAL"
+
     @torch.no_grad()
-    def predict_face(self,face):
-        p=torch.sigmoid(self.model(self._tensor(face))["logit"])[0].item()
-        return {"fake_probability":float(p),"label":"FAKE" if p>=self.image_threshold else "REAL"}
+    def predict_face(self,face,tta=True):
+        x=self._tensor(face)
+        prob=torch.sigmoid(self.model(x)["logit"])[0].item()
+        probs=[prob]
+        if tta:
+            flipped=cv2.flip(face,1)
+            probs.append(torch.sigmoid(self.model(self._tensor(flipped))["logit"])[0].item())
+        p=float(np.mean(probs))
+        gray=cv2.cvtColor(face,cv2.COLOR_BGR2GRAY)
+        blur=float(cv2.Laplacian(gray,cv2.CV_64F).var())
+        quality="low" if blur<40 or min(face.shape[:2])<96 else "ok"
+        return {
+            "fake_probability":p,
+            "label":self._label(p,self.image_threshold),
+            "tta_samples":len(probs),
+            "face_quality":quality,
+            "blur_score":blur
+        }
 
     def predict_image(self,bgr):
         faces=crop_faces(bgr,self.face_detector)
