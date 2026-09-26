@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from detection.predictor import Predictor
 
-app=FastAPI(title="ForensicFusion",version="1.1.0")
+app=FastAPI(title="Fake Face Detection System",version="1.1.0")
 BASE=Path(__file__).resolve().parent.parent
 STATIC=BASE/"static"
 IMAGE_MODEL=os.environ.get("FORENSIC_MODEL",str(BASE/"models"/"best_image_model.pth"))
