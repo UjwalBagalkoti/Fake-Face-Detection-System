@@ -40,7 +40,11 @@ class Predictor:
                 self.video_model.load_state_dict(self.video_payload.get("model",self.video_payload),strict=False)
                 self.video_model.to(self.device).eval()
         self.model.to(self.device).eval()
-        self.face_detector=FaceDetector()
+        try:
+            self.face_detector=FaceDetector()
+        except Exception as exc:
+            self.face_detector=None
+            print(f"Face detector unavailable; using whole-image fallback: {type(exc).__name__}: {exc}")
         self.tf=transforms.Compose([
             transforms.Resize((224,224)),transforms.ToTensor(),
             transforms.Normalize([.485,.456,.406],[.229,.224,.225])
@@ -82,6 +86,8 @@ class Predictor:
         return {"fake_probability":p,"label":self._label(p,self.image_threshold),"tta_samples":len(probs),"face_quality":quality,"blur_score":blur}
 
     def predict_image(self,bgr):
+        if self.face_detector is None:
+            return self.predict_face(bgr)|{"faces_detected":0,"mode":"whole_image_fallback","model_source":self.model_source,"face_detector":"unavailable"}
         faces=crop_faces(bgr,self.face_detector)
         if not faces:
             return self.predict_face(bgr)|{"faces_detected":0,"mode":"whole_image_fallback","model_source":self.model_source}
@@ -101,8 +107,11 @@ class Predictor:
             ok,frame=cap.read()
             if not ok: break
             if i in ids:
-                faces=crop_faces(frame,self.face_detector)
-                if faces: frames.append(max(faces,key=lambda f:f.score).image)
+                if self.face_detector is None:
+                    frames.append(frame)
+                else:
+                    faces=crop_faces(frame,self.face_detector)
+                    if faces: frames.append(max(faces,key=lambda f:f.score).image)
             i+=1
         cap.release()
         if not frames: raise ValueError("No detectable faces found in video")
