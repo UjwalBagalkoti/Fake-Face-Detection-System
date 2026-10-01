@@ -1,5 +1,5 @@
 from __future__ import annotations
-import os,tempfile
+import os,tempfile,logging,traceback
 from pathlib import Path
 from fastapi import FastAPI,File,UploadFile,HTTPException
 from fastapi.responses import FileResponse
@@ -47,7 +47,8 @@ async def predict_image(file:UploadFile=File(...)):
     try:
         return get_predictor().predict_image(img)
     except Exception as e:
-        raise HTTPException(500,f"Prediction failed: {e}") from e
+        logging.exception("IMAGE PREDICTION FAILED")
+        raise HTTPException(500,f"Prediction failed: {type(e).__name__}: {e}") from e
 
 @app.post("/api/predict/video")
 async def predict_video(file:UploadFile=File(...)):
@@ -61,7 +62,8 @@ async def predict_video(file:UploadFile=File(...)):
         try:
             return get_predictor().predict_video(temp)
         except Exception as e:
-            raise HTTPException(500,f"Prediction failed: {e}") from e
+            logging.exception("VIDEO PREDICTION FAILED")
+            raise HTTPException(500,f"Prediction failed: {type(e).__name__}: {e}") from e
     finally: Path(temp).unlink(missing_ok=True)
 
 app.mount("/static",StaticFiles(directory=STATIC),name="static")
