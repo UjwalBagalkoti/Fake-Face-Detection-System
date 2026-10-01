@@ -1,1 +1,94 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fake Face Detection System</title><style>body{margin:0;background:#0b1020;color:#f4f7fb;font-family:system-ui;min-height:100vh}.wrap{max-width:1000px;margin:auto;padding:40px 20px}.hero{margin-bottom:28px}.eyebrow{color:#9faeff;text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700}.hero h1{font-size:46px;margin:10px 0}.hero p{color:#9aa8c0;max-width:720px;line-height:1.6}.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}.card{background:#121a2d;border:1px solid #273653;border-radius:18px;padding:22px}.drop{border:1px dashed #52627f;border-radius:14px;padding:40px;text-align:center;cursor:pointer}.btn{width:100%;margin-top:14px;padding:13px;border:0;border-radius:10px;background:#7182ff;color:white;font-weight:700}.metric{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #273653}.prob{font-size:40px;font-weight:800}.bar{height:10px;background:#1c2842;border-radius:99px;overflow:hidden}.fill{height:100%;background:#7988ff;width:0}.small{color:#9aa8c0;font-size:13px;line-height:1.5}@media(max-width:800px){.grid{grid-template-columns:1fr}}</style></head><body><div class="wrap"><div class="hero"><div class="eyebrow">Forensic Analysis</div><h1>Fake Face Detection System</h1><p>Multistream deepfake detection using spatial CNN features, frequency-domain analysis, and temporal video reasoning.</p></div><div class="grid"><section class="card"><h2>Analyze media</h2><input id="file" type="file" hidden><div id="drop" class="drop">Click to select an image or video</div><button id="run" class="btn" disabled>Analyze</button><div id="out" style="display:none;margin-top:24px"><div class="small">Prediction</div><div id="label" class="prob"></div><div class="bar"><div id="fill" class="fill"></div></div><div class="metric"><span>Fake probability</span><b id="prob"></b></div><div id="extra"></div></div></section><aside class="card"><h2>Detection streams</h2><div class="metric"><span>Spatial</span><b>EfficientNet</b></div><div class="metric"><span>Frequency</span><b>FFT + CNN</b></div><div class="metric"><span>Temporal</span><b>Transformer</b></div><p class="small">Use a trained benchmark checkpoint and report results from an untouched test split.</p></aside></div></div><script>let f=null;const input=document.getElementById('file'),drop=document.getElementById('drop'),run=document.getElementById('run');drop.onclick=()=>input.click();input.onchange=()=>{f=input.files[0];run.disabled=!f;drop.textContent=f?.name||'Select a file'};run.onclick=async()=>{if(!f)return;const mode=f.type.startsWith('video/')?'video':'image',fd=new FormData();fd.append('file',f);run.disabled=true;try{const r=await fetch('/api/predict/'+mode,{method:'POST',body:fd}),j=await r.json();if(!r.ok)throw Error(j.detail);document.getElementById('out').style.display='block';document.getElementById('label').textContent=j.label;document.getElementById('prob').textContent=(j.fake_probability*100).toFixed(1)+'%';document.getElementById('fill').style.width=(j.fake_probability*100)+'%';document.getElementById('extra').innerHTML='<div class="metric"><span>Evidence</span><b>'+(mode==='image'?(j.faces_detected??0)+' face(s)':' '+j.frames_analyzed+' frames')+'</b></div>'}catch(e){alert(e.message)}finally{run.disabled=false}};</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fake Face Detection System</title>
+<style>
+body{margin:0;background:#0b1020;color:#f4f7fb;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+.wrap{max-width:1000px;margin:auto;padding:40px 20px}.hero{margin-bottom:28px}.eyebrow{color:#9faeff;text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700}
+.hero h1{font-size:46px;margin:10px 0}.hero p{color:#9aa8c0;max-width:720px;line-height:1.6}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}.card{background:#121a2d;border:1px solid #273653;border-radius:18px;padding:22px}
+.drop{border:1px dashed #52627f;border-radius:14px;padding:40px;text-align:center;cursor:pointer;transition:.2s}.drop:hover,.drop.drag{border-color:#7988ff;background:#151f38}
+.file-name{margin-top:12px;color:#dce4f5;font-size:14px;word-break:break-all}.btn{width:100%;margin-top:14px;padding:13px;border:0;border-radius:10px;background:#7182ff;color:white;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:.55;cursor:not-allowed}.status{display:none;margin-top:14px;padding:11px 13px;border-radius:10px;background:#1a2740;color:#b9c6dd;font-size:14px}.status.error{display:block;background:#351b25;color:#ffb8c5}.status.ok{display:block;background:#173127;color:#b8f0d2}
+.metric{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid #273653}.prob{font-size:40px;font-weight:800}.bar{height:10px;background:#1c2842;border-radius:99px;overflow:hidden}.fill{height:100%;background:#7988ff;width:0;transition:width .35s}
+.small{color:#9aa8c0;font-size:13px;line-height:1.5}.preview{display:none;max-width:100%;max-height:300px;margin:18px auto 0;border-radius:12px;object-fit:contain}.spinner{display:inline-block;width:12px;height:12px;border:2px solid #aab5ff;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;margin-right:7px;vertical-align:-2px}@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.hero h1{font-size:36px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero"><div class="eyebrow">Forensic Analysis</div><h1>Fake Face Detection System</h1><p>Multistream deepfake detection using spatial CNN features, frequency-domain analysis, and temporal video reasoning.</p></div>
+<div class="grid">
+<section class="card">
+<h2>Analyze media</h2>
+<input id="file" type="file" accept="image/*,video/mp4,video/webm,video/quicktime,video/x-msvideo" hidden>
+<div id="drop" class="drop">Click to select an image or video<br><span class="small">or drag and drop it here</span></div>
+<div id="fileName" class="file-name"></div>
+<img id="preview" class="preview" alt="Selected image preview">
+<button id="run" class="btn" disabled>Analyze</button>
+<div id="status" class="status" role="status" aria-live="polite"></div>
+<div id="out" style="display:none;margin-top:24px">
+<div class="small">Prediction</div><div id="label" class="prob"></div>
+<div class="bar"><div id="fill" class="fill"></div></div>
+<div class="metric"><span>Fake probability</span><b id="prob"></b></div>
+<div id="extra"></div>
+</div>
+</section>
+<aside class="card"><h2>Detection streams</h2>
+<div class="metric"><span>Spatial</span><b>EfficientNet</b></div><div class="metric"><span>Frequency</span><b>FFT + CNN</b></div><div class="metric"><span>Temporal</span><b>Transformer</b></div>
+<p class="small">Use a trained benchmark checkpoint and report results from an untouched test split.</p>
+</aside>
+</div>
+</div>
+<script>
+const input=document.getElementById("file"),drop=document.getElementById("drop"),run=document.getElementById("run");
+const statusBox=document.getElementById("status"),out=document.getElementById("out"),preview=document.getElementById("preview");
+const fileName=document.getElementById("fileName"),label=document.getElementById("label"),prob=document.getElementById("prob");
+const fill=document.getElementById("fill"),extra=document.getElementById("extra");
+let f=null,objectUrl=null;
+
+function setStatus(message,type=""){statusBox.className="status"+(type?" "+type:"");statusBox.textContent=message;statusBox.style.display=message?"block":"none";}
+function setFile(file){
+  if(!file){f=null;run.disabled=true;fileName.textContent="";return;}
+  const isImage=file.type.startsWith("image/");
+  const isVideo=file.type.startsWith("video/");
+  if(!isImage&&!isVideo){setStatus("Please choose a supported image or video file.","error");return;}
+  if(file.size>200*1024*1024){setStatus("File is too large. Maximum size is 200 MB.","error");return;}
+  f=file;run.disabled=false;fileName.textContent=file.name+" • "+(file.size/1024/1024).toFixed(2)+" MB";setStatus("");
+  out.style.display="none";fill.style.width="0";
+  if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl=URL.createObjectURL(file);
+  if(isImage){preview.src=objectUrl;preview.style.display="block"}else{preview.removeAttribute("src");preview.style.display="none"}
+}
+drop.onclick=()=>input.click();
+input.onchange=()=>setFile(input.files&&input.files[0]);
+["dragenter","dragover"].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add("drag")}));
+["dragleave","drop"].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove("drag")}));
+drop.addEventListener("drop",ev=>setFile(ev.dataTransfer.files&&ev.dataTransfer.files[0]));
+
+run.onclick=async()=>{
+ if(!f)return;
+ const mode=f.type.startsWith("video/")?"video":"image";
+ const endpoint="/api/predict/"+mode,fd=new FormData();fd.append("file",f);
+ run.disabled=true;run.innerHTML='<span class="spinner"></span>Analyzing...';setStatus("Uploading media and running forensic analysis...");
+ out.style.display="none";
+ try{
+   const response=await fetch(endpoint,{method:"POST",body:fd});
+   const text=await response.text();
+   let data;try{data=JSON.parse(text)}catch{throw new Error("The server returned an invalid response. Please try again.")}
+   if(!response.ok)throw new Error(data.detail||data.message||("Analysis failed (HTTP "+response.status+")"));
+   if(typeof data.fake_probability!=="number"||!data.label)throw new Error("The server response is missing prediction data.");
+   const pct=Math.max(0,Math.min(100,data.fake_probability*100));
+   out.style.display="block";label.textContent=data.label;prob.textContent=pct.toFixed(1)+"%";fill.style.width=pct+"%";
+   const evidence=mode==="image"?(data.faces_detected??0)+" face(s)":(data.frames_analyzed??0)+" frames";
+   extra.innerHTML='<div class="metric"><span>Evidence</span><b>'+evidence+'</b></div>'+
+     (data.face_quality?'<div class="metric"><span>Face quality</span><b>'+data.face_quality+'</b></div>':'')+
+     (data.model_source?'<div class="small" style="margin-top:12px">Model: '+data.model_source+'</div>':'');
+   setStatus("Analysis completed successfully.","ok");
+ }catch(err){console.error(err);setStatus(err.message||"Analysis failed. Please try again.","error")}
+ finally{run.disabled=!f;run.textContent="Analyze"}
+};
+</script>
+</body>
+</html>
