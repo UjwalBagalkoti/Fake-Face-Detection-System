@@ -2,6 +2,10 @@
 
 Fake Face Detection System is an end-to-end deepfake detection system for manipulated faces in images and videos. It combines spatial visual evidence, frequency-domain artifacts, and temporal consistency to produce a calibrated real/fake prediction.
 
+# Live
+
+https://fake-face-detection-system.onrender.com/
+
 ## Architecture
 
 ```text
