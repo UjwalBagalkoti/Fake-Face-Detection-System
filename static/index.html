@@ -10,7 +10,7 @@ body{margin:0;background:#0b1020;color:#f4f7fb;font-family:system-ui,-apple-syst
 .hero h1{font-size:46px;margin:10px 0}.hero p{color:#9aa8c0;max-width:720px;line-height:1.6}
 .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}.card{background:#121a2d;border:1px solid #273653;border-radius:18px;padding:22px}
 .drop{border:1px dashed #52627f;border-radius:14px;padding:40px;text-align:center;cursor:pointer;transition:.2s}.drop:hover,.drop.drag{border-color:#7988ff;background:#151f38}
-.file-name{margin-top:12px;color:#dce4f5;font-size:14px;word-break:break-all}.btn{width:100%;margin-top:14px;padding:13px;border:0;border-radius:10px;background:#7182ff;color:white;font-weight:700;cursor:pointer}
+.file-name{margin-top:12px;color:#dce4f5;font-size:14px;word-break:break-all}.btn{width:100%;margin-top:14px;padding:15px;border:0;border-radius:12px;background:#7182ff;color:white;font-weight:800;font-size:16px;cursor:pointer;transition:transform .12s,opacity .2s,box-shadow .2s}.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 22px #7182ff55}.btn:active:not(:disabled){transform:translateY(1px)}.btn.analyzing{background:#5969e8;box-shadow:0 0 0 3px #7182ff33,0 8px 24px #7182ff44;cursor:wait}
 .btn:disabled{opacity:.55;cursor:not-allowed}.status{display:none;margin-top:14px;padding:11px 13px;border-radius:10px;background:#1a2740;color:#b9c6dd;font-size:14px}.status.error{display:block;background:#351b25;color:#ffb8c5}.status.ok{display:block;background:#173127;color:#b8f0d2}
 .metric{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid #273653}.prob{font-size:40px;font-weight:800}.bar{height:10px;background:#1c2842;border-radius:99px;overflow:hidden}.fill{height:100%;background:#7988ff;width:0;transition:width .35s}
 .small{color:#9aa8c0;font-size:13px;line-height:1.5}.preview{display:none;max-width:100%;max-height:300px;margin:18px auto 0;border-radius:12px;object-fit:contain}.spinner{display:inline-block;width:12px;height:12px;border:2px solid #aab5ff;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;margin-right:7px;vertical-align:-2px}@keyframes spin{to{transform:rotate(360deg)}}
@@ -71,7 +71,7 @@ run.onclick=async()=>{
  if(!f)return;
  const mode=f.type.startsWith("video/")?"video":"image";
  const endpoint="/api/predict/"+mode,fd=new FormData();fd.append("file",f);
- run.disabled=true;run.innerHTML='<span class="spinner"></span>Analyzing...';setStatus("Uploading media and running forensic analysis...");
+ run.disabled=true;run.classList.add("analyzing");run.innerHTML='<span class="spinner"></span>Analyzing...';setStatus("Uploading media and running forensic analysis...");
  out.style.display="none";
  try{
    const response=await fetch(endpoint,{method:"POST",body:fd});
@@ -87,7 +87,7 @@ run.onclick=async()=>{
      (data.model_source?'<div class="small" style="margin-top:12px">Model: '+data.model_source+'</div>':'');
    setStatus("Analysis completed successfully.","ok");
  }catch(err){console.error(err);setStatus(err.message||"Analysis failed. Please try again.","error")}
- finally{run.disabled=!f;run.textContent="Analyze"}
+ finally{run.disabled=!f;run.classList.remove("analyzing");run.textContent="Analyze"}
 };
 </script>
 </body>
