@@ -74,7 +74,7 @@ class Predictor:
             probs=[prob]
             if tta:
                 flipped=cv2.flip(face,1)
-                probs.append(torch.sigmoid(self.model(self._tensor(flipped))["logit"])[0].item()]
+                probs.append(torch.sigmoid(self.model(self._tensor(flipped))["logit"])[0].item())
         p=float(np.mean(probs))
         gray=cv2.cvtColor(face,cv2.COLOR_BGR2GRAY)
         blur=float(cv2.Laplacian(gray,cv2.CV_64F).var())
